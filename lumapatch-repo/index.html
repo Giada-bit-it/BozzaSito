@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LumaPatch — Monitoraggio Intelligente della Guarigione</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="locked">
+  <!-- Ambient dynamic background layer -->
+  <div id="bg-layer" aria-hidden="true"></div>
+
+  <!-- Minimalist Apple-style fixed top navigation / progress bar (visible after "Inizia") -->
+  <header id="top-bar" class="top-bar hidden" aria-label="Barra di avanzamento tutorial">
+    <div class="top-bar-inner">
+      <div class="brand-mini">
+        <span class="brand-dot"></span>
+        <span class="brand-name">LumaPatch</span>
+      </div>
+      <nav class="step-pills" aria-label="Fasi del tutorial">
+        <button class="step-pill active" data-target="step-patch">Cerotto</button>
+        <button class="step-pill" data-target="step-device">Dispositivo UV</button>
+        <button class="step-pill" data-target="step-mount">Aggancio</button>
+        <button class="step-pill" data-target="step-guide">Guida Scatto</button>
+        <button class="step-pill" data-target="step-uv">Luce UV</button>
+        <button class="step-pill" data-target="step-alerts">Avvisi</button>
+        <button class="step-pill" data-target="step-chart">Grafico pH</button>
+      </nav>
+      <div class="progress-track">
+        <div id="global-progress" class="progress-fill"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       SCHERMATA INIZIALE IMMOBILE (BENVENUTO)
+       ========================================================= -->
+  <section id="welcome-screen" class="welcome-screen" aria-label="Schermata di benvenuto">
+    <div class="welcome-card">
+      <div class="logo-emblem" aria-hidden="true">
+        <div class="logo-ring outer"></div>
+        <div class="logo-ring inner"></div>
+        <div class="logo-patch">
+          <div class="logo-hydrogel"></div>
+        </div>
+      </div>
+
+      <span class="badge-pill">Medical Wellness · Sistema Bio-Ottico</span>
+      <h1 class="welcome-title">Benvenuto</h1>
+      <p class="welcome-subtitle">
+        Scopri come funziona il cerotto intelligente all’idrogel, il modulo UV per smartphone e il monitoraggio guidato della guarigione.
+      </p>
+
+      <div class="welcome-features">
+        <div class="wf-item">
+          <span class="wf-icon">🩹</span>
+          <span>Cerotto Idrogel</span>
+        </div>
+        <div class="wf-item">
+          <span class="wf-icon">🔦</span>
+          <span>Modulo UV 3D</span>
+        </div>
+        <div class="wf-item">
+          <span class="wf-icon">📈</span>
+          <span>Analisi pH</span>
+        </div>
+      </div>
+
+      <button id="btn-start" class="btn-start" type="button">
+        <span>Inizia</span>
+        <svg class="btn-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M4.5 10H15.5M15.5 10L10.5 5M15.5 10L10.5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <p class="welcome-hint">Premi <strong>Inizia</strong> per avviare il percorso interattivo</p>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MAIN CONTINUOUS SCROLL EXPERIENCE
+       ========================================================= -->
+  <main id="scroll-experience" class="scroll-experience is-hidden">
+
+    <!-- 1. SEZIONE TUTORIAL 3D A SCORRIMENTO CONTINUO -->
+    <section id="tutorial-stage-track" class="tutorial-track">
+      <!-- Sticky 3D viewport -->
+      <div class="sticky-viewport">
+        <!-- Three.js 3D Canvas -->
+        <canvas id="webgl-canvas"></canvas>
+
+        <!-- UV Ambient Glow Overlay (activates during UV phase) -->
+        <div id="uv-ambient-glow" class="uv-ambient-glow" aria-hidden="true"></div>
+
+        <!-- Subtle scroll cue -->
+        <div id="swipe-cue" class="swipe-cue">
+          <span>Scorri verso il basso</span>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- =========================================
+             OVERLAY STEP 1: IL CEROTTO QUADRATO
+             ========================================= -->
+        <div id="overlay-patch" class="stage-overlay" data-phase="patch">
+          <div class="stage-header">
+            <span class="eyebrow">01 · Il Cerotto Intelligente</span>
+            <h2>Cerotto Bio-Ottico all’Idrogel</h2>
+            <p>Progettato per proteggere la ferita con delicatezza e rilevare le variazioni biochimiche del pH in modo non invasivo.</p>
+          </div>
+
+          <!-- Technical Apple/PDF-style leader callouts -->
+          <div class="callout callout-patch-top-left" data-callout="patch-1">
+            <div class="callout-card">
+              <strong>Supporto Traspirante Bianco</strong>
+              <span>Tessuto medicale ipoallergenico, morbido e resistente all’acqua.</span>
+            </div>
+            <svg class="leader-svg" viewBox="0 0 120 70" fill="none" aria-hidden="true">
+              <path d="M10 12 H76 V62" stroke="#5E6E58" stroke-width="1.5"/>
+              <circle cx="10" cy="12" r="3.5" fill="#5E6E58"/>
+              <circle cx="76" cy="62" r="4" fill="#23461A"/>
+            </svg>
+          </div>
+
+          <div class="callout callout-patch-bottom-left" data-callout="patch-2">
+            <svg class="leader-svg" viewBox="0 0 130 85" fill="none" aria-hidden="true">
+              <path d="M90 8 V68 H16" stroke="#5E6E58" stroke-width="1.5"/>
+              <circle cx="90" cy="8" r="4" fill="#23461A"/>
+              <circle cx="16" cy="68" r="3.5" fill="#5E6E58"/>
+            </svg>
+            <div class="callout-card">
+              <strong>Idrogel Trasparente</strong>
+              <span>Matrice idratante sensibile al pH per una lettura ottica immediata.</span>
+            </div>
+          </div>
+
+          <div class="callout callout-patch-bottom-right" data-callout="patch-3">
+            <svg class="leader-svg" viewBox="0 0 110 70" fill="none" aria-hidden="true">
+              <path d="M22 10 V56 H94" stroke="#5E6E58" stroke-width="1.5"/>
+              <circle cx="22" cy="10" r="4" fill="#23461A"/>
+              <circle cx="94" cy="56" r="3.5" fill="#5E6E58"/>
+            </svg>
+            <div class="callout-card">
+              <strong>Marker di Precisione</strong>
+              <span>Riferimenti ottici agli angoli per centraggio e calibrazione automatica.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================
+             OVERLAY STEP 2: DISPOSITIVO UV SMARTPHONE
+             ========================================= -->
+        <div id="overlay-device" class="stage-overlay" data-phase="device">
+          <div class="stage-header">
+            <span class="eyebrow">02 · Modulo Ottico Smartphone</span>
+            <h2>Accessorio UV &amp; Acquisizione</h2>
+            <p>Un dispositivo compatto che si aggancia al telefono, illumina il cerotto con luce UV calibrata e ottimizza la messa a fuoco.</p>
+          </div>
+
+          <div class="callout callout-dev-left" data-callout="dev-1">
+            <svg class="leader-svg" viewBox="0 0 120 75" fill="none" aria-hidden="true">
+              <path d="M92 10 V58 H16" stroke="#5E6E58" stroke-width="1.5"/>
+              <circle cx="92" cy="10" r="4" fill="#23461A"/>
+              <circle cx="16" cy="58" r="3.5" fill="#5E6E58"/>
+            </svg>
+            <div class="callout-card">
+              <strong>Aggancio Rapido al Telefono</strong>
+              <span>Clip ergonomica antiscivolo compatibile con iPhone.</span>
+            </div>
+          </div>
+
+          <div class="callout callout-dev-right" data-callout="dev-2">
+            <svg class="leader-svg" viewBox="0 0 120 75" fill="none" aria-hidden="true">
+              <path d="M26 10 V58 H104" stroke="#5E6E58" stroke-width="1.5"/>
+              <circle cx="26" cy="10" r="4" fill="#23461A"/>
+              <circle cx="104" cy="58" r="3.5" fill="#5E6E58"/>
+            </svg>
+            <div class="callout-card">
+              <strong>Luce UV &amp; Ottica di Precisione</strong>
+              <span>Diffusore UV calibrato e lente dedicata sopra la fotocamera.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================
+             OVERLAY STEP 3: UNIONE & VISTA POSTERIORE
+             ========================================= -->
+        <div id="overlay-mount" class="stage-overlay" data-phase="mount">
+          <div class="stage-header stage-header-side">
+            <span class="eyebrow">03 · Aggancio Perfetto</span>
+            <h2>Si fissa sulla parte superiore dell’iPhone</h2>
+            <p>Il modulo ruota e si blocca sul bordo superiore: l’obiettivo del dispositivo UV si allinea esattamente sopra la fotocamera posteriore.</p>
+            <div class="mount-pill-list">
+              <span class="mini-pill">✓ Obiettivo allineato alla fotocamera</span>
+              <span class="mini-pill">✓ Vista posteriore stabilizzata</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================
+             OVERLAY STEP 4: ROTAZIONE FRONTALE & FOTOCAMERA
+             ========================================= -->
+        <div id="overlay-camera" class="stage-overlay" data-phase="camera">
+          <div class="stage-header stage-header-compact">
+            <span class="eyebrow">04 · Interfaccia App</span>
+            <h2>Inquadra il cerotto</h2>
+            <p>Lo schermo si attiva automaticamente in modalità acquisizione guidata, pronta a leggere i marker del cerotto.</p>
+          </div>
+        </div>
+
+        <!-- =========================================
+             OVERLAY STEP 5: ASSISTENTE ALLO SCATTO
+             ========================================= -->
+        <div id="overlay-guide" class="stage-overlay" data-phase="guide">
+          <div class="stage-header stage-header-compact">
+            <span class="eyebrow">05 · Simulazione di Utilizzo</span>
+            <h2 id="guide-title">L’app ti guida allo scatto perfetto</h2>
+            <p id="guide-desc">Sensori intelligenti controllano inclinazione, distanza e luminosità prima di scattare in autonomia.</p>
+          </div>
+
+          <!-- Side live telemetry card next to the zoomed iPhone -->
+          <aside class="telemetry-panel" aria-live="polite">
+            <div class="tele-row" id="tele-angle">
+              <span class="tele-icon">↻</span>
+              <div class="tele-text">
+                <strong>Orientamento</strong>
+                <span id="tele-angle-val">Inclina di 12° a destra</span>
+              </div>
+              <span class="tele-status" id="tele-angle-badge">Guida</span>
+            </div>
+            <div class="tele-row" id="tele-dist">
+              <span class="tele-icon">↔</span>
+              <div class="tele-text">
+                <strong>Distanza</strong>
+                <span id="tele-dist-val">Avvicinati a 10 cm</span>
+              </div>
+              <span class="tele-status" id="tele-dist-badge">In attesa</span>
+            </div>
+            <div class="tele-row" id="tele-light">
+              <span class="tele-icon">☀</span>
+              <div class="tele-text">
+                <strong>Condizioni di luce</strong>
+                <span id="tele-light-val">Premi tasto UV sul modulo</span>
+              </div>
+              <span class="tele-status" id="tele-light-badge">Verifica</span>
+            </div>
+            <div class="tele-capture-banner" id="tele-capture-banner">
+              <span class="check-circle">✓</span>
+              <span>Tutte le condizioni ottimali — Scatto automatico!</span>
+            </div>
+          </aside>
+
+          <!-- Physical UV button pointer (like Page 8 arrow) -->
+          <div id="uv-button-pointer" class="uv-button-pointer">
+            <div class="pointer-arrow">←</div>
+            <div class="pointer-label">Premi il tasto UV sul dispositivo</div>
+          </div>
+        </div>
+
+        <!-- =========================================
+             OVERLAY STEP 6: ILLUMINAZIONE UV AZZURRA
+             ========================================= -->
+        <div id="overlay-uv" class="stage-overlay" data-phase="uv">
+          <div class="stage-header stage-header-compact">
+            <span class="eyebrow">06 · Attivazione Luce UV</span>
+            <h2>Fluorescenza azzurra ad alta leggibilità</h2>
+            <p>La luce UV illumina il cerotto e l’area circostante di azzurro: attraverso la fotocamera l’idrogel rivela la risposta del pH.</p>
+          </div>
+
+          <div class="uv-status-card">
+            <div class="uv-pulse-dot"></div>
+            <div>
+              <strong>Spettro UV Attivo · 365–405 nm</strong>
+              <span>Lettura ottica completata con successo. Scorri per vedere i risultati possibili.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll Anchor Markers positioned directly on the 780vh track -->
+      <div id="step-patch" class="scroll-anchor" style="top: 0%"></div>
+      <div id="step-device" class="scroll-anchor" style="top: 20%"></div>
+      <div id="step-mount" class="scroll-anchor" style="top: 34%"></div>
+      <div id="step-camera" class="scroll-anchor" style="top: 47%"></div>
+      <div id="step-guide" class="scroll-anchor" style="top: 58%"></div>
+      <div id="step-uv" class="scroll-anchor" style="top: 76%"></div>
+    </section>
+
+    <!-- =========================================================
+         2. SEZIONE AVVISI POST-FOTO A SCORRIMENTO CONTINUO
+         ========================================================= -->
+    <section id="step-alerts" class="alerts-track">
+      <div class="alerts-sticky">
+        <div class="alerts-container">
+          <div class="alerts-header">
+            <span class="eyebrow">07 · Interpretazione Immediata</span>
+            <h2>Descrizione allerte dopo la foto</h2>
+            <p>Dopo ogni acquisizione l’app traduce i dati ottici in un segnale rassicurante e immediato, basato su colori ed emoji intuitive.</p>
+          </div>
+
+          <!-- 3 Focus Cards matching PDF Pages 11, 12, 13 -->
+          <div class="alerts-stage" role="list">
+            <article class="alert-card active" data-alert-index="0" data-bg="#A8BDA5" role="listitem">
+              <div class="alert-card-inner">
+                <div class="alert-emoji" aria-hidden="true">🤩</div>
+                <div class="alert-content">
+                  <div class="alert-chip-row">
+                    <span class="alert-tag">Verde salvia · #A8BDA5</span>
+                    <span class="alert-subtag">Evoluzione favorevole</span>
+                  </div>
+                  <h3>Guarita</h3>
+                  <p class="alert-desc">
+                    La ferita mostra riepitelizzazione completa e un pH stabilizzato nell’intervallo fisiologico (5.5 – 6.2). Puoi proseguire con la normale cura della pelle.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="alert-card" data-alert-index="1" data-bg="#DCEBDD" role="listitem">
+              <div class="alert-card-inner">
+                <div class="alert-emoji" aria-hidden="true">🙂</div>
+                <div class="alert-content">
+                  <div class="alert-chip-row">
+                    <span class="alert-tag">Verde tenue · #DCEBDD</span>
+                    <span class="alert-subtag">Progressi simulati</span>
+                  </div>
+                  <h3>In miglioramento</h3>
+                  <p class="alert-desc">
+                    Ottimo segnale: l’infiammazione è in riduzione e il pH sta scendendo progressivamente verso i valori normali. Continua il monitoraggio quotidiano.
+                  </p>
+                </div>
+              </div>
+            </article>
+
+            <article class="alert-card" data-alert-index="2" data-bg="#F2DEDC" role="listitem">
+              <div class="alert-card-inner">
+                <div class="alert-emoji" aria-hidden="true">🤒</div>
+                <div class="alert-content">
+                  <div class="alert-chip-row">
+                    <span class="alert-tag">Rosa tenue · #F2DEDC</span>
+                    <span class="alert-subtag">Richiede attenzione</span>
+                  </div>
+                  <h3>Infezione / Possibile criticità</h3>
+                  <p class="alert-desc">
+                    Rilevato un aumento del pH verso valori alcalini (&gt; 7.2), segnale tipico di possibile carica batterica o irritazione. Ti consigliamo di consultare il medico.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Complete 5-color Medical Wellness Scale legend from PDF Page 2 -->
+          <div class="wellness-scale">
+            <span class="scale-title">Scala cromatica Medical Wellness:</span>
+            <div class="scale-pills">
+              <span class="scale-pill" style="--swatch: #F0E6D8">🔍 Monitoraggio iniziale</span>
+              <span class="scale-pill" style="--swatch: #DCE9EF">🧪 Analisi in corso</span>
+              <span class="scale-pill" style="--swatch: #A8BDA5">🌱 Evoluzione favorevole</span>
+              <span class="scale-pill" style="--swatch: #DCEBDD">✨ Progressi simulati</span>
+              <span class="scale-pill" style="--swatch: #F2DEDC">⚠️ Richiede attenzione</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         3. SEZIONE GRAFICO MONITORAGGIO pH NEL TEMPO
+         ========================================================= -->
+    <section id="step-chart" class="chart-section">
+      <div class="chart-container">
+        <div class="chart-header">
+          <span class="eyebrow">08 · Andamento Clinico</span>
+          <h2>Grafico di monitoraggio nel tempo</h2>
+          <p>
+            Segui l’evoluzione del <strong>pH</strong> giorno dopo giorno: man mano che la ferita guarisce, il pH si riequilibra verso i valori fisiologici della pelle sana.
+          </p>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-meta-bar">
+            <div class="chart-metric">
+              <span class="metric-label">Parametro rilevato</span>
+              <span class="metric-value">pH Superficiale (5.0 – 8.0)</span>
+            </div>
+            <div class="chart-day-readout" id="chart-readout">
+              <span class="readout-day" id="readout-day">Dom · Giorno 7</span>
+              <span class="readout-ph" id="readout-ph">pH 5.6 · 🤩 Guarita</span>
+            </div>
+          </div>
+
+          <!-- Animated SVG Chart -->
+          <div class="svg-chart-wrap">
+            <svg id="ph-chart-svg" viewBox="0 0 760 360" class="ph-chart-svg" role="img" aria-label="Grafico dell'andamento del pH nei giorni di monitoraggio">
+              <defs>
+                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#D97B76"/>
+                  <stop offset="50%" stop-color="#6FA67B"/>
+                  <stop offset="100%" stop-color="#3B6E34"/>
+                </linearGradient>
+                <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#A8BDA5" stop-opacity="0.32"/>
+                  <stop offset="100%" stop-color="#A8BDA5" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Physiological & alert zones -->
+              <rect x="76" y="34" width="644" height="72" rx="8" fill="#F2DEDC" opacity="0.45"/>
+              <text x="708" y="54" text-anchor="end" class="zone-label zone-warn">Zona alcalina · Attenzione (&gt; 7.2)</text>
+
+              <rect x="76" y="106" width="644" height="106" rx="8" fill="#DCEBDD" opacity="0.35"/>
+              <text x="708" y="128" text-anchor="end" class="zone-label zone-mid">Transizione · In miglioramento</text>
+
+              <rect x="76" y="212" width="644" height="88" rx="8" fill="#A8BDA5" opacity="0.28"/>
+              <text x="708" y="286" text-anchor="end" class="zone-label zone-ok">Zona fisiologica · Guarigione (5.2 – 6.1)</text>
+
+              <!-- Horizontal Y Grid lines & labels (5, 5.75, 6.5, 7.25, 8 like PDF Page 14) -->
+              <g class="grid-lines">
+                <line x1="76" y1="34" x2="720" y2="34"/>
+                <text x="64" y="39" text-anchor="end" class="axis-tick">8.00</text>
+
+                <line x1="76" y1="100.5" x2="720" y2="100.5"/>
+                <text x="64" y="105.5" text-anchor="end" class="axis-tick">7.25</text>
+
+                <line x1="76" y1="167" x2="720" y2="167"/>
+                <text x="64" y="172" text-anchor="end" class="axis-tick">6.50</text>
+
+                <line x1="76" y1="233.5" x2="720" y2="233.5"/>
+                <text x="64" y="238.5" text-anchor="end" class="axis-tick">5.75</text>
+
+                <line x1="76" y1="300" x2="720" y2="300"/>
+                <text x="64" y="305" text-anchor="end" class="axis-tick">5.00</text>
+              </g>
+
+              <!-- Y-Axis Label -->
+              <text x="20" y="170" transform="rotate(-90 20 170)" text-anchor="middle" class="axis-title">Valore pH</text>
+
+              <!-- Area under curve -->
+              <path id="chart-area-path" class="chart-area" fill="url(#areaGrad)"
+                d="M 105 69 C 160 80, 195 100, 200 105 C 250 130, 290 155, 295 160 C 350 175, 385 182, 390 185 C 450 205, 480 218, 485 220 C 540 232, 575 238, 580 239 C 630 245, 665 247, 675 247 L 675 300 L 105 300 Z" />
+
+              <!-- Animated Curve Path (Lun pH 7.6 -> Dom pH 5.6) -->
+              <path id="chart-line-path" class="chart-line" fill="none" stroke="url(#lineGrad)" stroke-width="4" stroke-linecap="round"
+                d="M 105 69 C 160 80, 195 100, 200 105 C 250 130, 290 155, 295 160 C 350 175, 385 182, 390 185 C 450 205, 480 218, 485 220 C 540 232, 575 238, 580 239 C 630 245, 665 247, 675 247" />
+
+              <!-- Vertical drop connectors for the 3 milestones (like PDF Page 14) -->
+              <line class="drop-stem" id="stem-1" x1="105" y1="69" x2="105" y2="352"/>
+              <line class="drop-stem" id="stem-2" x1="390" y1="185" x2="390" y2="352"/>
+              <line class="drop-stem" id="stem-3" x1="675" y1="247" x2="675" y2="352"/>
+
+              <!-- Data Points (7 days) -->
+              <g id="chart-points">
+                <g class="chart-pt" data-day="Lun · Giorno 1" data-ph="pH 7.6 · 🤒 Infezione" tabindex="0">
+                  <circle class="pt-halo" cx="105" cy="69" r="12" fill="#D97B76"/>
+                  <circle class="pt-dot" cx="105" cy="69" r="6" fill="#D97B76" stroke="#fff" stroke-width="2.5"/>
+                  <text x="105" y="324" text-anchor="middle" class="x-tick">Lun</text>
+                </g>
+                <g class="chart-pt" data-day="Mar · Giorno 2" data-ph="pH 7.2 · ⚠️ Attenzione" tabindex="0">
+                  <circle class="pt-halo" cx="200" cy="105" r="10" fill="#D89A78"/>
+                  <circle class="pt-dot" cx="200" cy="105" r="5" fill="#D89A78" stroke="#fff" stroke-width="2"/>
+                  <text x="200" y="324" text-anchor="middle" class="x-tick">Mar</text>
+                </g>
+                <g class="chart-pt" data-day="Mer · Giorno 3" data-ph="pH 6.6 · 🧪 Analisi in corso" tabindex="0">
+                  <circle class="pt-halo" cx="295" cy="160" r="10" fill="#8FB39A"/>
+                  <circle class="pt-dot" cx="295" cy="160" r="5" fill="#8FB39A" stroke="#fff" stroke-width="2"/>
+                  <text x="295" y="324" text-anchor="middle" class="x-tick">Mer</text>
+                </g>
+                <g class="chart-pt" data-day="Gio · Giorno 4" data-ph="pH 6.3 · 🙂 In miglioramento" tabindex="0">
+                  <circle class="pt-halo" cx="390" cy="185" r="12" fill="#6FA67B"/>
+                  <circle class="pt-dot" cx="390" cy="185" r="6" fill="#6FA67B" stroke="#fff" stroke-width="2.5"/>
+                  <text x="390" y="324" text-anchor="middle" class="x-tick">Gio</text>
+                </g>
+                <g class="chart-pt" data-day="Ven · Giorno 5" data-ph="pH 5.9 · 🌱 Evoluzione favorevole" tabindex="0">
+                  <circle class="pt-halo" cx="485" cy="220" r="10" fill="#548E5B"/>
+                  <circle class="pt-dot" cx="485" cy="220" r="5" fill="#548E5B" stroke="#fff" stroke-width="2"/>
+                  <text x="485" y="324" text-anchor="middle" class="x-tick">Ven</text>
+                </g>
+                <g class="chart-pt" data-day="Sab · Giorno 6" data-ph="pH 5.7 · ✨ Progressi avanzati" tabindex="0">
+                  <circle class="pt-halo" cx="580" cy="239" r="10" fill="#467E44"/>
+                  <circle class="pt-dot" cx="580" cy="239" r="5" fill="#467E44" stroke="#fff" stroke-width="2"/>
+                  <text x="580" y="324" text-anchor="middle" class="x-tick">Sab</text>
+                </g>
+                <g class="chart-pt is-selected" data-day="Dom · Giorno 7" data-ph="pH 5.6 · 🤩 Guarita" tabindex="0">
+                  <circle class="pt-halo" cx="675" cy="247" r="14" fill="#3B6E34"/>
+                  <circle class="pt-dot" cx="675" cy="247" r="6.5" fill="#3B6E34" stroke="#fff" stroke-width="2.5"/>
+                  <text x="675" y="324" text-anchor="middle" class="x-tick">Dom</text>
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Stepped Milestone Badges + Ascending Healing Arrow (directly inspired by PDF Page 14) -->
+          <div class="milestones-stairs">
+            <div class="milestone-step step-low">
+              <div class="milestone-connector"></div>
+              <div class="milestone-pill pill-infection">
+                <span class="m-emoji">🤒</span>
+                <div>
+                  <strong>Infezione</strong>
+                  <small>Lun · pH 7.6</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="milestone-step step-mid">
+              <div class="milestone-connector"></div>
+              <div class="milestone-pill pill-improving">
+                <span class="m-emoji">🙂</span>
+                <div>
+                  <strong>In miglioramento</strong>
+                  <small>Gio · pH 6.3</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="milestone-step step-high">
+              <div class="milestone-connector"></div>
+              <div class="milestone-pill pill-healed">
+                <span class="m-emoji">🤩</span>
+                <div>
+                  <strong>Guarita</strong>
+                  <small>Dom · pH 5.6</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warm diagonal progression arrow -->
+          <div class="healing-trend-arrow">
+            <svg viewBox="0 0 420 68" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="trendWarm" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#ECC095"/>
+                  <stop offset="100%" stop-color="#E5A76E"/>
+                </linearGradient>
+              </defs>
+              <path d="M24 54 L378 16" stroke="url(#trendWarm)" stroke-width="7" stroke-linecap="round"/>
+              <path d="M360 7 L386 15 L368 35" fill="none" stroke="#E5A76E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="trend-caption">Progresso continuo verso la guarigione</span>
+          </div>
+        </div>
+
+        <footer class="end-footer">
+          <p>LumaPatch · Sistema dimostrativo di monitoraggio medico-benessere</p>
+          <button id="btn-replay" class="btn-replay" type="button">↺ Torna all’inizio</button>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- Three.js UMD with automatic fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"
+    onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';"></script>
+  <script src="scene3d.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
